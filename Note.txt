@@ -1,0 +1,161 @@
+
+How to create a fresh Laravel 11 project?
+If you don't have a fresh Laravel project created yet, here's how to do that:
+----------------------
+Terminal
+composer create-project laravel/laravel:^11.0 laravel-spa
+You'll need PHP and Composer installed on your machine for this to work. This command creates a new PHP project, based on laravel/laravel package, version >= 11.0, and the directory of the project will be laravel-spa.
+----------------------
+Installing PHP
+Installing Composer
+How to add Vue to Laravel?
+Once you have a Laravel project, you need to add Vue and Inertia to the stack.
+----------------------
+We're going to use a frontend tool called Vite for that.
+----------------------
+What is Vite?
+Let the Laravel docs speak:
+
+Vite is a modern frontend build tool that provides an extremely fast development environment and bundles your code for production.
+
+So yeah, essentially Vite was created by the Vue authors. It's the standard and most popular way to bundle JavaScript assets.
+
+Also used in React, so using Vite is good. If you used Laravel for longer, Vite has replaced Webpack. Read more about Vite.
+----------------------
+How to add Vue by installing a Vite plugin?
+First step is to add Vue plugin to Vite. We need to add the plugin first (source):
+----------------------
+Terminal
+
+npm install --save-dev @vitejs/plugin-vue
+
+Next up let's configure the Vite config file, vite.config.js at the root directory of your project:
+First make sure to add the import import vue from '@vitejs/plugin-vue'
+Then configure the Vue plugin vue({...}) as below:
+vite.config.js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+// Add the import below
+import vue from '@vitejs/plugin-vue';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+        // Add this vue plugin configuration here
+        vue({
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
+        })
+    ],
+});
+Just installing this Vite Vue plugin is enough to also install the Vue library. You don't need to install it separately!
+
+How to add Inertia.js to Laravel?
+You're doing great. Now, let's also add Inertia shall we? Inertia needs to be configured both for Laravel, and for Vue. Let's do the backend config first (source).
+
+Install the Inertia.js Composer package
+Just run this in the Terminal to get the Inertia.js package for Laravel:
+
+Terminal
+composer require inertiajs/inertia-laravel
+Configure the root template
+Next let's configure the root template. It's the main Blade template that Inertia will use to render the Vue app. By default it's assumed the file is called app.blade.php. When creating the Laravel project, you'll get the welcome.blade.php file, let's rename it and change the contents:
+
+resources/view/welcome.blade.php -> resources/view/app.blade.php
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Laravel</title>
+
+        @vite('resources/js/app.js')
+        @inertiaHead
+    </head>
+    <body>
+        @inertia
+    </body>
+</html>
+Adding Inertia.js directives to the root template
+Inside the file you need to add 3 directives:
+
+@vite to add your app source JavaScript file
+@inertiaHead to add all Inertia scripts
+@inertia that let's Inertia render the Vue application
+Adding Inertia.js middleware
+Publish the Inertia.js middleware by running:
+Terminal
+php artisan inertia:middleware
+Modify the bootstrap/app.php file, adding this Inertia.js middleware to the web group:
+bootstrap/app.php
+// Add this line at the top
+use App\Http\Middleware\HandleInertiaRequests;
+
+// Find the line starting with ->withMiddleware and modify the contents
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->web(append: [
+        HandleInertiaRequests::class,
+    ]);
+})
+How to add Inertia.js to Vue?
+Next, we also need to create the Vue app in a specific way (source).
+
+Install the Inertia.js Vue package
+Install the Inertia.js Vue package by running:
+
+Terminal
+npm install @inertiajs/vue3
+How to initialize the Inertia.js application with Vue?
+Modify the resources/js/app.js as follows:
+
+resources/js/app.js
+import { createApp, h } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
+
+createInertiaApp({
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+    return pages[`./Pages/${name}.vue`]
+  },
+  setup({ el, App, props, plugin }) {
+    createApp({ render: () => h(App, props) })
+      .use(plugin)
+      .mount(el)
+  },
+})
+How to create a Vue page inside Laravel?
+Next, let's start adding pages powered by Vue from now now, instead of Blade. You can pass the data to that Vue pages the same way as you were passing the data to blade templates.
+
+Adding a Laravel route that will render a Vue page
+Add the following route to routes/web.php file.
+
+Notice, we're using an inertia function instead of typical view to render the view.
+The Vue pages should be placed in resources/js/Pages.
+routes/web.php
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return inertia('Index/Index');
+});
+Creating the Vue page file
+Now, let's create the resources/js/Pages/Index/Index.vue file, and use the following contents:
+
+resources/js/Pages/Index/Index.vue
+<template>Hello {{ counter }}!</template>
+
+<script setup>
+  import {ref} from 'vue'
+  const counter = ref(0)
+  setInterval(() => counter.value++, 1000)
+</script>
+If you see a counter, changing every second it means you're good to go. You can now build your SPA application using Laravel, Vue and Inertia!
