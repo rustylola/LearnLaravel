@@ -16,7 +16,12 @@ class IndexController extends Controller
     }
 
     public function show(){
-        return inertia('Index/show');
+        return inertia(
+            'Index/show',
+            [
+                'message'=> 'Hello Laravel'
+            ]
+        );
     }
 
 }
