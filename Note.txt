@@ -65,10 +65,12 @@ Just run this in the Terminal to get the Inertia.js package for Laravel:
 
 Terminal
 composer require inertiajs/inertia-laravel
+
 Configure the root template
 Next let's configure the root template. It's the main Blade template that Inertia will use to render the Vue app. By default it's assumed the file is called app.blade.php. When creating the Laravel project, you'll get the welcome.blade.php file, let's rename it and change the contents:
 
 resources/view/welcome.blade.php -> resources/view/app.blade.php
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -91,11 +93,14 @@ Inside the file you need to add 3 directives:
 @inertiaHead to add all Inertia scripts
 @inertia that let's Inertia render the Vue application
 Adding Inertia.js middleware
+
 Publish the Inertia.js middleware by running:
 Terminal
 php artisan inertia:middleware
+
 Modify the bootstrap/app.php file, adding this Inertia.js middleware to the web group:
 bootstrap/app.php
+
 // Add this line at the top
 use App\Http\Middleware\HandleInertiaRequests;
 
@@ -159,3 +164,34 @@ resources/js/Pages/Index/Index.vue
   setInterval(() => counter.value++, 1000)
 </script>
 If you see a counter, changing every second it means you're good to go. You can now build your SPA application using Laravel, Vue and Inertia!
+
+
+# ADD ESLINT FOR DEBUGGING
+
+# Add file jsconfig.json and put:
+
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "resources/js/*"
+      ]
+    },
+    "jsx": "preserve",
+  },
+  "exclude": [
+    "node_modules",
+    "public"
+  ]
+}
+
+# ADD .vscode terminal debugging
+# Copy setting.json
+
+In Terminal install for dev only:
+npm install --save-dev globals @eslint/js
+npm install --save-dev eslint eslint-plugin-vue
+
+# Copy jsconfig.json
+# Copy eslint.config.js
