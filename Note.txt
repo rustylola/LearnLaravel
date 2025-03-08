@@ -195,3 +195,15 @@ npm install --save-dev eslint eslint-plugin-vue
 
 # Copy jsconfig.json
 # Copy eslint.config.js
+
+// Install laravel debug bar and IDE Helper
+
+In terminal install this dev only:
+composer require barryvdh/laravel-debugbar --dev
+
+make sure APP_DEBUG=true
+
+// Install IDE debug
+In terminal:
+composer require --dev brryvdh/laravel-ide-helper
+php artisan ide-helper:generate // to generate suggestion format and codes
