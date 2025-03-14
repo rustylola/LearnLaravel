@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('listings', function (Blueprint $table) {
-            $table->unsignedInteger('beds');
-            $table->unsignedInteger('baths');
-            $table->unsignedInteger('area');
+            $table->unsignedTinyInteger('beds');
+            $table->unsignedTinyInteger('baths');
+            $table->unsignedSmallInteger('area');
 
             $table->tinyText('city');
             $table->tinyText('code');
